@@ -1,4 +1,6 @@
 using FolderExplorer.Data;
+using FolderExplorer.Interfaces;
+using FolderExplorer.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +11,7 @@ builder.Services.AddDbContext<DataContext>(opt =>
 {
     opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+builder.Services.AddScoped<IExportService, ExportService>();
 
 var app = builder.Build();
 
@@ -29,6 +32,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Folder}/{action=Index}/{id?}");
+    pattern: "{controller=Folder}/{action=ShowFolder}/{id?}");
 
 app.Run();

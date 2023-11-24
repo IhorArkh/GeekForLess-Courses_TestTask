@@ -1,0 +1,18 @@
+﻿@model FolderExplorer.Entities.Folder
+
+<h2>Folders Explorer</h2>
+
+<ul>
+    @foreach (var folder in Model.ChildFolders)
+    {
+        <li>
+            <a asp-controller="Folder" asp-action="ShowFolder" asp-route-id="@folder.Id">
+                @folder.Name
+            </a>
+        </li>
+    }
+</ul>
+
+<a asp-controller="Folder" asp-action="Export" class="btn btn-secondary" role="button">Export to JSON</a>
+<a asp-controller="Folder" asp-action="ImportFromFile" class="btn btn-secondary" role="button">Import from JSON</a>
+<a asp-controller="Folder" asp-action="ImportFromSystem" class="btn btn-secondary" role="button">Import from System</a>

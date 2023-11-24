@@ -6,11 +6,11 @@ using FolderExplorer.Models;
 
 namespace FolderExplorer.Services;
 
-public class ExportService : IExportService
+public class FolderDataService : IFolderDataService
 {
     private readonly DataContext _context;
 
-    public ExportService(DataContext context)
+    public FolderDataService(DataContext context)
     {
         _context = context;
     }
@@ -61,6 +61,22 @@ public class ExportService : IExportService
         {
             ImportFolder(childImportFolder, newFolder);
         }
+    }
+
+    public Folder ImportFolderFromSystem(string folderPath, Folder parentFolder)
+    {
+        var folderName = Path.GetFileName(folderPath);
+
+        var newFolder = new Folder { Name = folderName, ParentFolder = parentFolder };
+
+        _context.Folders.Add(newFolder);
+
+        foreach (var subdirectory in Directory.GetDirectories(folderPath))
+        {
+            ImportFolderFromSystem(subdirectory, newFolder);
+        }
+
+        return newFolder;
     }
 
     private ExportFolder ConvertToExportFolder(Folder folder, List<Folder> allFolders)

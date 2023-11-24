@@ -11,7 +11,7 @@ builder.Services.AddDbContext<DataContext>(opt =>
 {
     opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-builder.Services.AddScoped<IExportService, ExportService>();
+builder.Services.AddScoped<IFolderDataService, FolderDataService>();
 
 var app = builder.Build();
 

@@ -12,12 +12,12 @@ namespace FolderExplorer.Controllers;
 public class FolderController : Controller
 {
     private readonly DataContext _context;
-    private readonly IExportService _exportService;
+    private readonly IFolderDataService _folderDataService;
 
-    public FolderController(DataContext context, IExportService exportService)
+    public FolderController(DataContext context, IFolderDataService folderDataService)
     {
         _context = context;
-        _exportService = exportService;
+        _folderDataService = folderDataService;
     }
 
     public IActionResult ShowFolder(int? id)
@@ -59,18 +59,18 @@ public class FolderController : Controller
             .Include(f => f.ChildFolders)
             .ToList();
 
-        var json = _exportService.ExportToJson(allFolders);
+        var json = _folderDataService.ExportToJson(allFolders);
 
         return File(Encoding.UTF8.GetBytes(json), "application/json", "export.json");
     }
 
-    public IActionResult Import()
+    public IActionResult ImportFromFile()
     {
         return View();
     }
 
     [HttpPost]
-    public IActionResult Import(IFormFile file)
+    public IActionResult ImportFromFile(IFormFile file)
     {
         _context.Folders.RemoveRange(_context.Folders);
         _context.SaveChanges();
@@ -81,11 +81,41 @@ public class FolderController : Controller
             {
                 var json = reader.ReadToEnd();
 
-                _exportService.ImportFromJson(json);
+                _folderDataService.ImportFromJson(json);
             }
         }
 
         return RedirectToAction("ShowFolder");
+    }
+
+    public IActionResult ImportFromSystem()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public IActionResult ImportFromSystem(string directoryPath)
+    {
+        try
+        {
+            _context.Folders.RemoveRange(_context.Folders);
+            _context.SaveChanges();
+
+            if (!Directory.Exists(directoryPath))
+            {
+                return BadRequest("Wrong path!");
+            }
+
+            var rootFolder = _folderDataService.ImportFolderFromSystem(directoryPath, null);
+
+            _context.SaveChanges();
+
+            return RedirectToAction("ShowFolder", new { id = rootFolder.Id });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Error during import: {ex.Message}");
+        }
     }
 
     public IActionResult Privacy()

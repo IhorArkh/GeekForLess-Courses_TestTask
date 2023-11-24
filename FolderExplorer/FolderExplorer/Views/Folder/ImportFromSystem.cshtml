@@ -1,0 +1,12 @@
+﻿@model string
+
+<h2>Import from File</h2>
+
+@using (Html.BeginForm("ImportFromSystem", "Folder", FormMethod.Post))
+{
+    <div class="form-group">
+        <label for="directoryPath">Path:</label>
+        <input type="text" name="directoryPath" class="form-control" value="@Model" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Import</button>
+}
